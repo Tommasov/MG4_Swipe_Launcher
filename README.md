@@ -1,4 +1,4 @@
-# MG4 Swipe (MG4 Swipe NovaLauncher)
+# MG4 Swipe Launcher
 
 <p align="center">
   <img src="https://ws2.tommasovietina.it/mg4/MG4_Swipe.png" alt="MG4 Swipe Launcher" width="200" />
@@ -6,13 +6,14 @@
 
 MG4_Swipe_NovaLauncher is an app that enables a **swipe up** action from the bottom edge of the screen to quickly launch a user-selected app. This feature is especially useful for fast and easy access to a specific app of your choice.
 
-> 💡 It pairs perfectly with [MG4 Simple Launcher](https://github.com/Tommasov/MG4_Simple_Launcher): set it as the app launched by the swipe gesture for a clean, system-integrated home experience.
+> 💡 It pairs perfectly with [MG4 Simple Launcher](https://github.com/Tommasov/MG4_Simple_Launcher) — which is now the **default** swipe target. As the home launcher it stays warm in memory, so the swipe re-opens it almost instantly, for a clean, system-integrated home experience.
 
 ## Features
 
 - **Swipe up from the bottom edge**: Quickly launch your chosen app with a simple swipe-up gesture.
-- **Nova Launcher Compatibility**: It launches Nova Launcher by default.
-- **Configuration**: Select the app you want to launch opening MG4 Swipe app.
+- **Default target — MG4 Simple Launcher**: out of the box the swipe opens [MG4 Simple Launcher](https://github.com/Tommasov/MG4_Simple_Launcher) (`com.tommasov.mg4simplelauncher`). Being the home launcher it stays warm, so it re-opens almost instantly.
+- **Any app works too**: Nova Launcher (or any installed app) can be chosen instead of the default from the MG4 Swipe main screen.
+- **Configuration**: Select the app you want to launch by opening the MG4 Swipe app.
 
 ## Settings
 

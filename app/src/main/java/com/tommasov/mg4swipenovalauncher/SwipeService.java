@@ -69,7 +69,7 @@ public class SwipeService extends Service {
                     ContextCompat.RECEIVER_NOT_EXPORTED);
             createNotificationChannel();
             Notification notification = new Notification.Builder(this, CHANNEL_ID)
-                    .setContentTitle("MG4 Nova Launcher Swipe Service")
+                    .setContentTitle("MG4 Swipe Launcher Service")
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .build();
             startForeground(1, notification);
