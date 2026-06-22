@@ -8,6 +8,25 @@ MG4_Swipe_NovaLauncher is an app that enables a **swipe up** action from the bot
 
 > 💡 It pairs perfectly with [MG4 Simple Launcher](https://github.com/Tommasov/MG4_Simple_Launcher) — which is now the **default** swipe target. As the home launcher it stays warm in memory, so the swipe re-opens it almost instantly, for a clean, system-integrated home experience.
 
+## ⚠️ Upgrading from v1.2 (or earlier) — please read
+
+**EN —** Starting from **v1.4** the app is signed with a new, stable signing key.
+Android does **not** allow installing an update over an app signed with a different
+key, so you cannot update on top of an older build: you must **uninstall the
+previous version first**, then install v1.4. This is a **one-time** step needed only
+to migrate to the new signed builds — every future update will install normally,
+with no uninstall. (Your settings are stored per-app, so they are reset on
+reinstall.)
+
+**IT —** A partire dalla **v1.4** l'app è firmata con una nuova chiave di firma
+stabile. Android **non** consente di installare un aggiornamento sopra un'app
+firmata con una chiave diversa, quindi non puoi aggiornare sopra una versione
+precedente: devi prima **disinstallare la versione vecchia** e poi installare la
+v1.4. È un passaggio **una tantum**, necessario solo per migrare alle nuove build
+firmate — tutti gli aggiornamenti futuri si installeranno normalmente, senza
+disinstallare. (Le impostazioni sono salvate per app, quindi verranno azzerate con
+la reinstallazione.)
+
 ## Features
 
 - **Swipe up from the bottom edge**: Quickly launch your chosen app with a simple swipe-up gesture.
