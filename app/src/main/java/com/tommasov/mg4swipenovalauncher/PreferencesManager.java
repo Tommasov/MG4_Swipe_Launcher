@@ -65,6 +65,6 @@ public class PreferencesManager {
     }
 
     public boolean isShowLoader() {
-        return sharedPreferences.getBoolean(KEY_SHOW_LOADER, false);
+        return sharedPreferences.getBoolean(KEY_SHOW_LOADER, true);
     }
 }

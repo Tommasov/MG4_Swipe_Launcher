@@ -4,6 +4,11 @@ All notable changes to **MG4 Swipe Launcher** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project roughly follows semantic versioning.
 
+## [1.4.1] - 2026-06-22
+
+### Changed
+- The "Opening…" loader overlay is now **enabled by default** for new installs.
+
 ## [1.4] - 2026-06-22
 
 ### ⚠️ Breaking — existing users must reinstall once
