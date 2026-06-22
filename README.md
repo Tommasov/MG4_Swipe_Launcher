@@ -1,4 +1,4 @@
-# MG4_Swipe_NovaLauncher
+# MG4 Swipe (MG4 Swipe NovaLauncher)
 
 <p align="center">
   <img src="https://ws2.tommasovietina.it/mg4/MG4_Swipe.png" alt="MG4 Swipe Launcher" width="200" />
