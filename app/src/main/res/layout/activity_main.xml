@@ -36,17 +36,34 @@
 
     </LinearLayout>
 
-    <Switch
-        android:id="@+id/switch_swap_areas"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="200dp"
         android:layout_marginBottom="8dp"
-        android:minHeight="48dp"
-        android:text="@string/swap_swipe_areas"
-        android:textAlignment="viewEnd"
-        android:textSize="16sp"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        android:orientation="horizontal">
+
+        <Switch
+            android:id="@+id/switch_swap_areas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/swap_swipe_areas"
+            android:textSize="16sp"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        <Switch
+            android:id="@+id/switch_show_loader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/show_loader"
+            android:textAlignment="viewEnd"
+            android:textSize="16sp"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/explanation_text"
@@ -60,7 +77,7 @@
     <ListView
         android:id="@+id/app_list"
         android:layout_width="match_parent"
-        android:layout_height="440dp"
+        android:layout_height="400dp"
         android:layout_marginHorizontal="200dp"
         android:layout_marginBottom="20dp" />
 

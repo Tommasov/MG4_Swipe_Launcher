@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -31,12 +33,17 @@ public class SwipeService extends Service {
     // Initial position (px) of the floating back button.
     private static final int FLOATING_BUTTON_X = 25;
     private static final int FLOATING_BUTTON_Y = 5;
+    // How long the "opening" loader overlay stays on screen (ms).
+    private static final long LOADER_DURATION_MS = 1500;
     private WindowManager windowManager;
     private View leftSwipeArea;
     private View rightSwipeArea;
     private View floatingButton;
+    private View loaderView;
     private GestureDetector leftGestureDetector;
     private GestureDetector rightGestureDetector;
+    private final Handler loaderHandler = new Handler(Looper.getMainLooper());
+    private Runnable loaderRemoveRunnable;
 
     @SuppressLint("ForegroundServiceType")
     @Override
@@ -99,12 +106,59 @@ public class SwipeService extends Service {
             packageName = DEFAULT_LAUNCHER_PACKAGE;
         }
 
+        // getLaunchIntentForPackage() returns NEW_TASK | RESET_TASK_IF_NEEDED by default.
+        // RESET_TASK_IF_NEEDED resets the task when it is brought back from the background,
+        // which can add extra work when re-foregrounding the (home) launcher and was a
+        // suspect for the 2-3s delay on the second swipe. We instead reuse the existing
+        // instance with NEW_TASK | SINGLE_TOP, so no task reset is forced.
         Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
         if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            if (preferencesManager.isShowLoader()) {
+                showLoader();
+            }
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         } else {
             Toast.makeText(this, R.string.package_not_found, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Shows a lightweight, non-interactive overlay (spinner + label) over the home
+    // transition to mask the brief icon flash and make the 2-3s re-open read as an
+    // intentional "loading" rather than a glitch. It is purely perceptual: a fixed
+    // timer, since we can't know when the launched app is actually ready.
+    private void showLoader() {
+        if (windowManager == null) {
+            return;
+        }
+        // Drop any loader still on screen from a previous rapid swipe.
+        hideLoader();
+
+        loaderView = LayoutInflater.from(this).inflate(R.layout.layout_loader, null);
+
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT);
+        params.gravity = Gravity.CENTER;
+
+        windowManager.addView(loaderView, params);
+
+        loaderRemoveRunnable = this::hideLoader;
+        loaderHandler.postDelayed(loaderRemoveRunnable, LOADER_DURATION_MS);
+    }
+
+    private void hideLoader() {
+        if (loaderRemoveRunnable != null) {
+            loaderHandler.removeCallbacks(loaderRemoveRunnable);
+            loaderRemoveRunnable = null;
+        }
+        if (loaderView != null) {
+            removeViewSafely(loaderView);
+            loaderView = null;
         }
     }
 
@@ -252,6 +306,7 @@ public class SwipeService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        hideLoader();
         removeViewSafely(leftSwipeArea);
         removeViewSafely(rightSwipeArea);
         removeViewSafely(floatingButton);

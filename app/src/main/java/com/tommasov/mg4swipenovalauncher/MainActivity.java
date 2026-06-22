@@ -111,6 +111,13 @@ public class MainActivity extends AppCompatActivity {
             startSwipeService();
         });
 
+        Switch switchShowLoader = findViewById(R.id.switch_show_loader);
+        switchShowLoader.setChecked(preferencesManager.isShowLoader());
+        // The loader preference is read on every swipe in SwipeService, so no service
+        // restart is needed for the change to take effect.
+        switchShowLoader.setOnCheckedChangeListener((buttonView, isChecked) ->
+                preferencesManager.setShowLoader(isChecked));
+
         startSwipeService();
     }
 

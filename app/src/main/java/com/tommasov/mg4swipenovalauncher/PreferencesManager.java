@@ -8,6 +8,7 @@ public class PreferencesManager {
     private static final String KEY_PACKAGE_NAME = "packageName";
     private static final String KEY_BACK_BUTTON_VISIBLE = "backButtonVisible";
     private static final String KEY_SWIPE_AREAS_SWAPPED = "swipeAreasSwapped";
+    private static final String KEY_SHOW_LOADER = "showLoader";
     // Legacy string key ("VISIBLE"/"INVISIBLE") kept only for one-time migration.
     private static final String LEGACY_KEY_BACK_BUTTON_VISIBILITY = "backButtonVisibility";
 
@@ -55,5 +56,15 @@ public class PreferencesManager {
 
     public boolean isSwipeAreasSwapped() {
         return sharedPreferences.getBoolean(KEY_SWIPE_AREAS_SWAPPED, false);
+    }
+
+    public void setShowLoader(boolean show) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_SHOW_LOADER, show);
+        editor.apply();
+    }
+
+    public boolean isShowLoader() {
+        return sharedPreferences.getBoolean(KEY_SHOW_LOADER, false);
     }
 }
