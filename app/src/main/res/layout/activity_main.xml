@@ -35,6 +35,17 @@
 
     </LinearLayout>
 
+    <Switch
+        android:id="@+id/switch_swap_areas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="200dp"
+        android:layout_marginBottom="8dp"
+        android:minHeight="48dp"
+        android:text="@string/swap_swipe_areas"
+        android:textAlignment="viewEnd"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
     <TextView
         android:id="@+id/explanation_text"
         android:layout_width="wrap_content"
@@ -47,7 +58,7 @@
     <ListView
         android:id="@+id/app_list"
         android:layout_width="match_parent"
-        android:layout_height="460dp"
+        android:layout_height="440dp"
         android:layout_marginHorizontal="200dp"
         android:layout_marginBottom="20dp" />
 

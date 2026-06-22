@@ -100,7 +100,29 @@ public class MainActivity extends AppCompatActivity {
             startSwipeService();
         });
 
+        Switch switchSwapAreas = findViewById(R.id.switch_swap_areas);
+        switchSwapAreas.setChecked(preferencesManager.isSwipeAreasSwapped());
+        updateHelpLabels(preferencesManager.isSwipeAreasSwapped());
+
+        switchSwapAreas.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            preferencesManager.setSwipeAreasSwapped(isChecked);
+            updateHelpLabels(isChecked);
+            stopSwipeService();
+            startSwipeService();
+        });
+
         startSwipeService();
+    }
+
+    private void updateHelpLabels(boolean swapped) {
+        TextView leftHelp = findViewById(R.id.textView);
+        TextView rightHelp = findViewById(R.id.textView2);
+        leftHelp.setText(swapped
+                ? R.string.help_swipe_up_here_to_open_selected_app
+                : R.string.help_swipe_up_here_to_go_back_this_simulate_the_physical_back_button);
+        rightHelp.setText(swapped
+                ? R.string.help_swipe_up_here_to_go_back_this_simulate_the_physical_back_button
+                : R.string.help_swipe_up_here_to_open_selected_app);
     }
 
     private void stopSwipeService() {

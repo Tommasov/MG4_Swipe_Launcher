@@ -146,8 +146,18 @@ public class SwipeService extends Service {
         windowManager.addView(leftSwipeArea, leftParams);
         windowManager.addView(rightSwipeArea, rightParams);
 
-        leftGestureDetector = new GestureDetector(this, new SwipeUpGestureListener(this::performBackAction));
-        rightGestureDetector = new GestureDetector(this, new SwipeUpGestureListener(this::openLauncher));
+        // By default the left area goes back and the right area opens the launcher.
+        // When the areas are swapped, the actions are exchanged.
+        Runnable leftAction = this::performBackAction;
+        Runnable rightAction = this::openLauncher;
+        if (preferencesManager.isSwipeAreasSwapped()) {
+            Runnable tmp = leftAction;
+            leftAction = rightAction;
+            rightAction = tmp;
+        }
+
+        leftGestureDetector = new GestureDetector(this, new SwipeUpGestureListener(leftAction));
+        rightGestureDetector = new GestureDetector(this, new SwipeUpGestureListener(rightAction));
 
         leftSwipeArea.setOnTouchListener(new View.OnTouchListener() {
             @Override
