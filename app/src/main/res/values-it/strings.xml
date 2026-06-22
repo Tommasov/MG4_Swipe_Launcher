@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MG 4 Swipe Nova Launcher</string>
+    <string name="app_name">MG4 Swipe Launcher</string>
     <string name="explanation_text">Scegli una app da lanciare con lo swipe dal basso.</string>
     <string name="show_system_apps">Mostra le app di sistema</string>
     <string name="hide_system_apps">Nascondi le app di sistema</string>

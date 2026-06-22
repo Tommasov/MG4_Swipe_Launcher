@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MG 4 Swipe Nova Launcher</string>
+    <string name="app_name">MG4 Swipe Launcher</string>
     <string name="explanation_text">Choose an app to launch with a swipe up.</string>
     <string name="show_system_apps">Show System Apps</string>
     <string name="hide_system_apps">Hide System Apps</string>
