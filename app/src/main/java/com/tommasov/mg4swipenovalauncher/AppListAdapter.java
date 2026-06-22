@@ -16,7 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AppListAdapter extends ArrayAdapter<ApplicationInfo> {
     private final PackageManager packageManager;
@@ -46,16 +48,19 @@ public class AppListAdapter extends ArrayAdapter<ApplicationInfo> {
     }
 
     private void filterApps() {
+        Set<String> launcherPackages = getLauncherPackages();
         List<ApplicationInfo> filteredApps = new ArrayList<>();
 
+        // Launchers first...
         for (ApplicationInfo appInfo : allApps) {
-            if (isLauncherApp(appInfo)) {
+            if (launcherPackages.contains(appInfo.packageName)) {
                 filteredApps.add(appInfo);
             }
         }
 
+        // ...then the remaining (optionally hiding system apps).
         for (ApplicationInfo appInfo : allApps) {
-            if (!isLauncherApp(appInfo) && (showSystemApps || !isSystemApp(appInfo))) {
+            if (!launcherPackages.contains(appInfo.packageName) && (showSystemApps || !isSystemApp(appInfo))) {
                 filteredApps.add(appInfo);
             }
         }
@@ -65,17 +70,15 @@ public class AppListAdapter extends ArrayAdapter<ApplicationInfo> {
         notifyDataSetChanged();
     }
 
-    private boolean isLauncherApp(ApplicationInfo appInfo) {
+    private Set<String> getLauncherPackages() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
 
-        List<ResolveInfo> resolveInfos = packageManager.queryIntentActivities(intent, 0);
-        for (ResolveInfo resolveInfo : resolveInfos) {
-            if (resolveInfo.activityInfo.packageName.equals(appInfo.packageName)) {
-                return true;
-            }
+        Set<String> packages = new HashSet<>();
+        for (ResolveInfo resolveInfo : packageManager.queryIntentActivities(intent, 0)) {
+            packages.add(resolveInfo.activityInfo.packageName);
         }
-        return false;
+        return packages;
     }
 
     private boolean isSystemApp(ApplicationInfo appInfo) {

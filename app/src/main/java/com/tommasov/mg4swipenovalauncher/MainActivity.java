@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             preferencesManager.saveSelectedPackage(selectedApp.packageName);
             adapter.setSelectedPackage(selectedApp.packageName);
             adapter.notifyDataSetChanged();
-            Toast.makeText(MainActivity.this, "Selected: " + selectedApp.packageName, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getString(R.string.selected_app, selectedApp.packageName), Toast.LENGTH_SHORT).show();
         });
 
         Button toggleSystemAppsButton = findViewById(R.id.toggle_system_apps_button);
@@ -91,16 +91,11 @@ public class MainActivity extends AppCompatActivity {
 
         Switch switchBackButton = findViewById(R.id.switch_back_button);
 
-        switchBackButton.setChecked(!preferencesManager.getBackButtonVisibility().equals("VISIBLE"));
+        // The switch label reads "Hide the back button", so checked == hidden.
+        switchBackButton.setChecked(!preferencesManager.isBackButtonVisible());
 
-        switchBackButton.setOnClickListener(view -> {
-            if (preferencesManager.getBackButtonVisibility().equals("VISIBLE")) {
-                preferencesManager.saveBackButtonVisibility("INVISIBLE");
-                switchBackButton.setChecked(true);
-            } else {
-                preferencesManager.saveBackButtonVisibility("VISIBLE");
-                switchBackButton.setChecked(false);
-            }
+        switchBackButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            preferencesManager.setBackButtonVisible(!isChecked);
             stopSwipeService();
             startSwipeService();
         });

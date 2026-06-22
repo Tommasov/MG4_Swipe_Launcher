@@ -10,4 +10,6 @@
     <string name="nascondi_il_bottone_indietro_utile_per_i_tagliandi">Hide the floating back button, useful for car servicing (this is hidden by default)</string>
     <string name="help_swipe_up_here_to_go_back_this_simulate_the_physical_back_button">Help: Swipe up here to go back (this simulate the physical back button)</string>
     <string name="help_swipe_up_here_to_open_selected_app">Help: Swipe up here to open selected app</string>
+    <string name="package_not_found">Package not found</string>
+    <string name="selected_app">Selected: %1$s</string>
 </resources>

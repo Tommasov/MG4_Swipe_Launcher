@@ -9,6 +9,8 @@
     <string name="concedi_permesso">Concedi Permesso</string>
     <string name="per_funzionare_correttamente_l_app_ha_bisogno_del_permesso_di_disegnare_sopra_le_altre_app">Per funzionare correttamente, l\'app ha bisogno del permesso di disegnare sopra le altre app. \nUna volta concesso devi riaprire l\'applicazione.</string>
     <string name="nascondi_il_bottone_indietro_utile_per_i_tagliandi">Nascondi il bottone indietro flottante, utile per i tagliandi (nascosto di default)</string>
-    <string name="help_swipe_up_here_to_go_back_this_simulate_the_physical_back_button">Help: Swipe up here to go back (this simulate the physical back button)</string>
-    <string name="help_swipe_up_here_to_open_selected_app">Help: Swipe up here to open selected app</string>
+    <string name="help_swipe_up_here_to_go_back_this_simulate_the_physical_back_button">Aiuto: scorri verso l\'alto qui per tornare indietro (simula il tasto fisico Indietro)</string>
+    <string name="help_swipe_up_here_to_open_selected_app">Aiuto: scorri verso l\'alto qui per aprire l\'app selezionata</string>
+    <string name="package_not_found">App non trovata</string>
+    <string name="selected_app">Selezionata: %1$s</string>
 </resources>

@@ -7,7 +7,6 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
@@ -26,6 +25,12 @@ import android.widget.Toast;
 public class SwipeService extends Service {
     private PreferencesManager preferencesManager;
     private static final String CHANNEL_ID = "SwipeServiceChannel";
+    private static final String DEFAULT_LAUNCHER_PACKAGE = "com.teslacoilsw.launcher";
+    // Height (px) of the invisible touch strips at the bottom edge.
+    private static final int SWIPE_AREA_HEIGHT = 10;
+    // Initial position (px) of the floating back button.
+    private static final int FLOATING_BUTTON_X = 25;
+    private static final int FLOATING_BUTTON_Y = 5;
     private WindowManager windowManager;
     private View leftSwipeArea;
     private View rightSwipeArea;
@@ -39,6 +44,7 @@ public class SwipeService extends Service {
         super.onCreate();
 
         if (Settings.canDrawOverlays(this)) {
+            preferencesManager = new PreferencesManager(this);
             createNotificationChannel();
             Notification notification = new Notification.Builder(this, CHANNEL_ID)
                     .setContentTitle("MG4 Nova Launcher Swipe Service")
@@ -54,37 +60,25 @@ public class SwipeService extends Service {
         }
     }
 
-    private class LeftSwipeGestureListener extends SimpleOnGestureListener {
+    private static class SwipeUpGestureListener extends SimpleOnGestureListener {
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            float startY = e1.getRawY();
-            float endY = e2.getRawY();
-            float diffY = endY - startY;
+        private final Runnable action;
 
-            if (diffY < 0 && Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                performBackAction();
-                return true;
-            }
-
-            return false;
+        SwipeUpGestureListener(Runnable action) {
+            this.action = action;
         }
-    }
-
-    private class RightSwipeGestureListener extends SimpleOnGestureListener {
-        private static final int SWIPE_THRESHOLD = 100;
-        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            float startY = e1.getRawY();
-            float endY = e2.getRawY();
-            float diffY = endY - startY;
+            if (e1 == null) {
+                return false;
+            }
+            float diffY = e2.getRawY() - e1.getRawY();
 
             if (diffY < 0 && Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                openLauncher();
+                action.run();
                 return true;
             }
 
@@ -93,16 +87,16 @@ public class SwipeService extends Service {
     }
 
     private void performBackAction() {
-        Intent intent = new Intent("com.tommasov.mg4swipenovalauncher.ACTION_BACK");
+        Intent intent = new Intent(AccService.ACTION_BACK);
+        intent.setPackage(getPackageName());
         sendBroadcast(intent);
     }
 
     private void openLauncher() {
-        SharedPreferences sharedPreferences = getSharedPreferences("SwipeServicePrefs", Context.MODE_PRIVATE);
-        String packageName = sharedPreferences.getString("packageName", null);
+        String packageName = preferencesManager.getSelectedPackage();
 
         if (packageName == null) {
-            packageName = "com.teslacoilsw.launcher";
+            packageName = DEFAULT_LAUNCHER_PACKAGE;
         }
 
         Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
@@ -110,7 +104,7 @@ public class SwipeService extends Service {
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         } else {
-            Toast.makeText(this, "Package not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.package_not_found, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -133,7 +127,7 @@ public class SwipeService extends Service {
 
         WindowManager.LayoutParams leftParams = new WindowManager.LayoutParams(
                 halfScreenWidth,
-                10,
+                SWIPE_AREA_HEIGHT,
                 layoutFlags,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
@@ -142,7 +136,7 @@ public class SwipeService extends Service {
 
         WindowManager.LayoutParams rightParams = new WindowManager.LayoutParams(
                 halfScreenWidth,
-                10,
+                SWIPE_AREA_HEIGHT,
                 layoutFlags,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
@@ -152,8 +146,8 @@ public class SwipeService extends Service {
         windowManager.addView(leftSwipeArea, leftParams);
         windowManager.addView(rightSwipeArea, rightParams);
 
-        leftGestureDetector = new GestureDetector(this, new LeftSwipeGestureListener());
-        rightGestureDetector = new GestureDetector(this, new RightSwipeGestureListener());
+        leftGestureDetector = new GestureDetector(this, new SwipeUpGestureListener(this::performBackAction));
+        rightGestureDetector = new GestureDetector(this, new SwipeUpGestureListener(this::openLauncher));
 
         leftSwipeArea.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -171,11 +165,7 @@ public class SwipeService extends Service {
     }
 
     private void backButton() {
-        preferencesManager = new PreferencesManager(this);
-
-        String backButtonVisibility = preferencesManager.getBackButtonVisibility();
-
-        if (backButtonVisibility.equals("INVISIBLE")) {
+        if (!preferencesManager.isBackButtonVisible()) {
             return;
         }
 
@@ -193,8 +183,8 @@ public class SwipeService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.TOP | Gravity.LEFT;
-        params.x = 25;
-        params.y = 5;
+        params.x = FLOATING_BUTTON_X;
+        params.y = FLOATING_BUTTON_Y;
 
         windowManager.addView(floatingButton, params);
 
@@ -252,15 +242,19 @@ public class SwipeService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (leftSwipeArea != null) {
-            windowManager.removeView(leftSwipeArea);
-        }
-        if (rightSwipeArea != null) {
-            windowManager.removeView(rightSwipeArea);
-        }
+        removeViewSafely(leftSwipeArea);
+        removeViewSafely(rightSwipeArea);
+        removeViewSafely(floatingButton);
+    }
 
-        if (floatingButton != null) {
-            windowManager.removeView(floatingButton);
+    private void removeViewSafely(View view) {
+        if (view == null || windowManager == null) {
+            return;
+        }
+        try {
+            windowManager.removeView(view);
+        } catch (IllegalArgumentException e) {
+            // View was never attached (e.g. permission revoked mid-lifecycle); nothing to remove.
         }
     }
 

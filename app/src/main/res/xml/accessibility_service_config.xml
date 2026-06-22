@@ -7,5 +7,4 @@
     android:notificationTimeout="100"
     android:accessibilityFlags="flagDefault"
     android:canRetrieveWindowContent="true"
-    android:description="@string/accessibility_service_description"
-    android:settingsActivity="com.tommasov.mg4swipenovalauncher.YourSettingsActivity" />
+    android:description="@string/accessibility_service_description" />
