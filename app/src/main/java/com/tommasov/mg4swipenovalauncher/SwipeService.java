@@ -31,7 +31,10 @@ import androidx.core.content.ContextCompat;
 public class SwipeService extends Service {
     private PreferencesManager preferencesManager;
     private static final String CHANNEL_ID = "SwipeServiceChannel";
-    private static final String DEFAULT_LAUNCHER_PACKAGE = "com.teslacoilsw.launcher";
+    // Default swipe target: MG4 Simple Launcher. As the home launcher it stays warm in
+    // memory, so re-foregrounding it is near-instant — unlike resuming a heavy third-party
+    // launcher (e.g. Nova, com.teslacoilsw.launcher) which the head unit tends to evict.
+    private static final String DEFAULT_LAUNCHER_PACKAGE = "com.tommasov.mg4simplelauncher";
     // Height (px) of the invisible touch strips at the bottom edge.
     private static final int SWIPE_AREA_HEIGHT = 10;
     // Initial position (px) of the floating back button.
