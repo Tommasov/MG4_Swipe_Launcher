@@ -44,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
         TextView explanationText = findViewById(R.id.explanation_text);
         explanationText.setText(R.string.explanation_text);
 
+        TextView versionText = findViewById(R.id.version_text);
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            versionText.setText(getString(R.string.version_label, versionName));
+        } catch (PackageManager.NameNotFoundException e) {
+            versionText.setText("");
+        }
+
         String currentPackageName = getPackageName();
         packageManager = getPackageManager();
         List<ApplicationInfo> userApps = new ArrayList<>();

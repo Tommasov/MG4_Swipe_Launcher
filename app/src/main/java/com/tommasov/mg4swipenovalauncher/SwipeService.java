@@ -33,8 +33,9 @@ public class SwipeService extends Service {
     // Initial position (px) of the floating back button.
     private static final int FLOATING_BUTTON_X = 25;
     private static final int FLOATING_BUTTON_Y = 5;
-    // How long the "opening" loader overlay stays on screen (ms).
-    private static final long LOADER_DURATION_MS = 1500;
+    // How long the "opening" loader overlay stays on screen (ms). Tuned to roughly
+    // match the MG4 home re-open time so it doesn't dismiss before the app is visible.
+    private static final long LOADER_DURATION_MS = 2500;
     private WindowManager windowManager;
     private View leftSwipeArea;
     private View rightSwipeArea;
