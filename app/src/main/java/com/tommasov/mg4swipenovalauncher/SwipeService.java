@@ -5,8 +5,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
@@ -24,6 +26,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 public class SwipeService extends Service {
     private PreferencesManager preferencesManager;
     private static final String CHANNEL_ID = "SwipeServiceChannel";
@@ -33,9 +37,10 @@ public class SwipeService extends Service {
     // Initial position (px) of the floating back button.
     private static final int FLOATING_BUTTON_X = 25;
     private static final int FLOATING_BUTTON_Y = 5;
-    // How long the "opening" loader overlay stays on screen (ms). Tuned to roughly
-    // match the MG4 home re-open time so it doesn't dismiss before the app is visible.
-    private static final long LOADER_DURATION_MS = 2500;
+    // Safety cap (ms) for the "opening" loader. The loader is normally dismissed the
+    // instant the target app's window becomes foreground (see foregroundReceiver); this
+    // timer only fires if that event never arrives, so the overlay can never get stuck.
+    private static final long LOADER_TIMEOUT_MS = 4000;
     private WindowManager windowManager;
     private View leftSwipeArea;
     private View rightSwipeArea;
@@ -45,6 +50,9 @@ public class SwipeService extends Service {
     private GestureDetector rightGestureDetector;
     private final Handler loaderHandler = new Handler(Looper.getMainLooper());
     private Runnable loaderRemoveRunnable;
+    // Package whose appearance on screen should dismiss the loader. Set when the loader
+    // is shown, cleared once dismissed. null means "not currently waiting".
+    private String pendingLoaderPackage;
 
     @SuppressLint("ForegroundServiceType")
     @Override
@@ -53,10 +61,13 @@ public class SwipeService extends Service {
 
         if (Settings.canDrawOverlays(this)) {
             preferencesManager = new PreferencesManager(this);
+            IntentFilter foregroundFilter = new IntentFilter(AccService.ACTION_FOREGROUND_PACKAGE);
+            ContextCompat.registerReceiver(this, foregroundReceiver, foregroundFilter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED);
             createNotificationChannel();
             Notification notification = new Notification.Builder(this, CHANNEL_ID)
                     .setContentTitle("MG4 Nova Launcher Swipe Service")
-                    .setSmallIcon(R.mipmap.ismart_launcher)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .build();
             startForeground(1, notification);
 
@@ -94,6 +105,18 @@ public class SwipeService extends Service {
         }
     }
 
+    // Dismisses the loader as soon as the launched target app reports its window as
+    // foreground, so the overlay stays up exactly as long as the (variable) open takes.
+    private final BroadcastReceiver foregroundReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String pkg = intent.getStringExtra(AccService.EXTRA_PACKAGE);
+            if (pendingLoaderPackage != null && pendingLoaderPackage.equals(pkg)) {
+                hideLoader();
+            }
+        }
+    };
+
     private void performBackAction() {
         Intent intent = new Intent(AccService.ACTION_BACK);
         intent.setPackage(getPackageName());
@@ -116,6 +139,9 @@ public class SwipeService extends Service {
         if (intent != null) {
             if (preferencesManager.isShowLoader()) {
                 showLoader();
+                // Arm the foreground watcher: the loader is dismissed when this package
+                // becomes visible. Set after showLoader(), which clears any prior state.
+                pendingLoaderPackage = packageName;
             }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
@@ -125,9 +151,10 @@ public class SwipeService extends Service {
     }
 
     // Shows a lightweight, non-interactive overlay (spinner + label) over the home
-    // transition to mask the brief icon flash and make the 2-3s re-open read as an
-    // intentional "loading" rather than a glitch. It is purely perceptual: a fixed
-    // timer, since we can't know when the launched app is actually ready.
+    // transition to mask the brief icon flash and make the variable re-open read as an
+    // intentional "loading" rather than a glitch. It is dismissed event-driven, when the
+    // target app's window becomes foreground (foregroundReceiver); LOADER_TIMEOUT_MS is
+    // only a safety cap so the overlay can never get stuck if that event is missed.
     private void showLoader() {
         if (windowManager == null) {
             return;
@@ -149,10 +176,11 @@ public class SwipeService extends Service {
         windowManager.addView(loaderView, params);
 
         loaderRemoveRunnable = this::hideLoader;
-        loaderHandler.postDelayed(loaderRemoveRunnable, LOADER_DURATION_MS);
+        loaderHandler.postDelayed(loaderRemoveRunnable, LOADER_TIMEOUT_MS);
     }
 
     private void hideLoader() {
+        pendingLoaderPackage = null;
         if (loaderRemoveRunnable != null) {
             loaderHandler.removeCallbacks(loaderRemoveRunnable);
             loaderRemoveRunnable = null;
@@ -307,6 +335,11 @@ public class SwipeService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(foregroundReceiver);
+        } catch (IllegalArgumentException e) {
+            // Receiver was never registered (overlay permission missing at onCreate).
+        }
         hideLoader();
         removeViewSafely(leftSwipeArea);
         removeViewSafely(rightSwipeArea);
