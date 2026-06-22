@@ -6,6 +6,8 @@
 
 MG4_Swipe_NovaLauncher is an app that enables a **swipe up** action from the bottom edge of the screen to quickly launch a user-selected app. This feature is especially useful for fast and easy access to a specific app of your choice.
 
+> 💡 It pairs perfectly with [MG4 Simple Launcher](https://github.com/Tommasov/MG4_Simple_Launcher): set it as the app launched by the swipe gesture for a clean, system-integrated home experience.
+
 ## Features
 
 - **Swipe up from the bottom edge**: Quickly launch your chosen app with a simple swipe-up gesture.
