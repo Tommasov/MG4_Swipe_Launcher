@@ -1,5 +1,9 @@
 # MG4_Swipe_NovaLauncher
 
+<p align="center">
+  <img src="https://ws2.tommasovietina.it/mg4/MG4_Swipe.png" alt="MG4 Swipe Launcher" width="200" />
+</p>
+
 MG4_Swipe_NovaLauncher is an app that enables a **swipe up** action from the bottom edge of the screen to quickly launch a user-selected app. This feature is especially useful for fast and easy access to a specific app of your choice.
 
 ## Features
