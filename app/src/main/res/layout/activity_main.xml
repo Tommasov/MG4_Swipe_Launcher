@@ -31,6 +31,7 @@
             android:minHeight="48dp"
             android:text="@string/nascondi_il_bottone_indietro_utile_per_i_tagliandi"
             android:textAlignment="viewEnd"
+            android:textSize="16sp"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     </LinearLayout>
@@ -44,6 +45,7 @@
         android:minHeight="48dp"
         android:text="@string/swap_swipe_areas"
         android:textAlignment="viewEnd"
+        android:textSize="16sp"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <TextView

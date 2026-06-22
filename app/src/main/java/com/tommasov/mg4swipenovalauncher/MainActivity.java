@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
         rightHelp.setText(swapped
                 ? R.string.help_swipe_up_here_to_go_back_this_simulate_the_physical_back_button
                 : R.string.help_swipe_up_here_to_open_selected_app);
+        leftHelp.setBackgroundResource(swapped ? R.color.help_open_area : R.color.help_back_area);
+        rightHelp.setBackgroundResource(swapped ? R.color.help_back_area : R.color.help_open_area);
     }
 
     private void stopSwipeService() {
